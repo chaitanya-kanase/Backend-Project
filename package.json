@@ -1,0 +1,12 @@
+{
+  "name": "mega_project_backend",
+  "version": "1.0.0",
+  "description": "Full Backend project for learning mern in production grade coding style",
+  "license": "ISC",
+  "author": "Chaitanya Kanase",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
