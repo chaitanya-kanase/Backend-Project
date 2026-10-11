@@ -1,9 +1,9 @@
-const asynHandeler = (requestHandeler)=> (req,res,next)=>{
+const asyncHandeler = (requestHandeler)=> {return(req,res,next)=>{
     Promise.resolve(requestHandeler(req,res,next))
     .catch((error)=> next(error))
-}
+}}
 
-export {asynHandeler}
+export {asyncHandeler}
 
 //Second Methode without promises
 //Use of async await and try catch

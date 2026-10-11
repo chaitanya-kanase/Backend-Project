@@ -54,17 +54,17 @@ const userSchema = mongoose.Schema({
     }
 }, { timeStamps: true })
 
-userSchema.pre("save", async (next) => {
+userSchema.pre("save", async function () {
     if (!this.isModified("password")) return next()
-    this.password = bcrypt.hash(this.password, 10)
-    next()
+    this.password = await bcrypt.hash(this.password, 10)
+    
 })
 
-userSchema.methodes.isPasswordCorrect = async (password) => {
+userSchema.methods.isPasswordCorrect = async function(password) {
     return await bcrypt.compare(password, this.password)
 }
 
-userSchema.methodes.generateAccessToken = async () => {
+userSchema.methods.generateAccessToken = async function() {
     jwt.sign(
         {
             _id: this._id,
@@ -79,7 +79,7 @@ userSchema.methodes.generateAccessToken = async () => {
     )
 }
 
-userSchema.methodes.generateRefreshToken = async () => {
+userSchema.methods.generateRefreshToken = async function() {
     jwt.sign(
         {
             _id: this._id,
