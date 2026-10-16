@@ -189,6 +189,99 @@ const refershAccessToken = asyncHandeler(async(req,res)=>{
     )
 })
 
+const changePassword = asyncHandeler(async(req,res)=>{
+    const { oldPassword, newPassword} = req.body;
 
+    if(!oldPassword || !newPassword){
+        throw new apiError(400,"All credentials are required")
+    }
+    const user = User.findById(req.user?._id)
 
-export {registerUser,loginUser,logoutUser,refershAccessToken}
+    const isPasswordCorrect = await user.isPasswordCorrect(oldPassword)
+
+    if(!isPasswordCorrect){
+        throw new apiError(400,"Password is incorrect")
+    }
+
+    user.password = newPassword
+
+    user.save({validateBeforeSave : false})
+
+    return res.status(200).json(new apiResponse(201,{},"Password changed successfully"))
+})
+
+const getCurrentUser = asyncHandeler(async(req,res)=>{
+    return res
+    .status(200)
+    .json(new apiResponse(
+        200,
+        req.user,
+        "User fetched successfully"
+    ))
+})
+
+const updateAccountDetails = asyncHandeler(async(req,res)=>{
+    const {email, fullname} = req.body
+
+    if(!email || !fullname){
+        throw new apiError(400,"Email or Fullname required")
+    }
+
+    const user = User.findByIdAndUpdate(
+        req.user?._id,
+        {
+            $set : {
+                fullname,
+                email
+            }
+        },
+        {
+            new : true
+        }
+    ).select("-password")
+
+    return res.status(200).json(new apiResponse(200,user,"Account details chabged successfully"))
+})
+
+const updateUserAvtar = asyncHandeler(async(req,res)=>{
+    const avtarUrl = req.file?.url
+
+    if(!avtarUrl){
+        throw new apiError(400,"error while uploading an avtar")
+    }
+
+    const user = await User.findByIdAndUpdate(
+        req.user?._id,
+        {
+            $set:{
+                avtar: avtarUrl
+            }
+        },
+        {new:true}
+    )
+
+    return res.status(200).json(new apiResponse(200,user,"Avtar updated successfully"))
+})
+
+const updateCoverImg = asyncHandeler(async(req,res)=>{
+    const coverImgUrl = req.file?.url
+
+    if(!avtarUrl){
+        throw new apiError(400,"error while uploading an cover image")
+    }
+
+    const user = await User.findByIdAndUpdate(
+        req.user?._id,
+        {
+            $set:{
+                coverimage: coverImgUrl
+            }
+        },
+        {new:true}
+    )
+
+    return res.status(200).json(new apiResponse(200,user,"coverimage updated successfully"))
+
+})
+
+export {registerUser,loginUser,logoutUser,refershAccessToken,changePassword,getCurrentUser,updateAccountDetails,updateUserAvtar,updateCoverImg}
