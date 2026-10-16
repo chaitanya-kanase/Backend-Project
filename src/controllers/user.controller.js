@@ -3,9 +3,10 @@ import {apiError} from "../utils/apiError.js"
 import {User} from "../models/user.model.js"
 import {uploadOnCloudinary} from "../utils/cloudinary.js"
 import {apiResponse} from "../utils/apiResponse.js"
+import jwt from "jsonwebtoken"
 
 const generateAccessAndRefreshToken = async(userId)=>{
-    const user = User.findById(userId)
+    const user =await User.findById(userId)
 
     const accessToken = user.generateAccessToken()
     const refreshToken = user.generateRefreshToken()
@@ -81,7 +82,7 @@ const registerUser = asyncHandeler(async(req,res)=>{
 const loginUser = asyncHandeler(async(req,res)=>{
     const { username,email,password } = req.body;
 
-    if(!email || !username){
+    if(!(email || username)){
         throw new apiError(400,"All credentials are required")
     }
 
@@ -93,33 +94,36 @@ const loginUser = asyncHandeler(async(req,res)=>{
         throw new apiError(401,"User doesn't exist")
     }
 
-    const isUserValide = user.isPasswordCorrect( password )
+    const isUserValide =await user.isPasswordCorrect( password )
 
     if(!isUserValide){
         throw new apiError(401, "Password is incorrect, plz entre correct passsword")
     }
 
-    const { accessToken, refreshToken } = generateAccessAndRefreshToken(user._id)
+    const { accessToken, refreshToken } = await generateAccessAndRefreshToken(user._id)
+
 
     const loggedUser = await User.findById(user._id).select("-password -refreshtoken");
 
     const options = {
         httpOnly : true,
-        secure : true
+        secure : false
     }
 
     return res.status(200)
     .cookie("accessToken",accessToken,options)
     .cookie("refreshToken",refreshToken,options)
-    .json(
+    .json(new apiResponse(
         200,
         {
-            user : loggedUser,accessToken,refreshToken
-        },
+        user: loggedUser,
+        accessToken,
+        refreshToken
+    },
 
-        "User Loggedin successfully"
-    )
-
+    "User Logged In"
+    ))
+    
 })
 
 const logoutUser = asyncHandeler(async (req,res)=>{
@@ -146,4 +150,45 @@ const logoutUser = asyncHandeler(async (req,res)=>{
         .json(new apiResponse(201, {}, "User logged out successfully"))
 })
 
-export {registerUser,loginUser,logoutUser}
+const refershAccessToken = asyncHandeler(async(req,res)=>{
+    const incomingRefreshToken = req.cookies.refreshtoken
+
+    if(!incomingRefreshToken){
+        throw new apiError(400 , "Unauthorized access")
+    }
+
+    const decodedToken = jwt.verify(incomingRefreshToken,process.env.REFRESH_TOKEN_SECREATE)
+
+    const user = await User.findById(decodedToken?._id)
+
+    if(!user){
+        throw new apiError(404,"User not exists")
+    }
+
+    if(incomingRefreshToken !== user.refreshtoken){
+        throw new apiError(400,"Token expired")
+    }
+
+    const {accessToken,refreshToken} = await generateAccessAndRefreshToken(user._id)
+    const options = 
+        {
+            secure : true,
+            httpOnly : true
+        }
+    
+
+    res.status(200)
+    .cookie("accessToken",accessToken,options)
+    .cookie("refreshToken", refreshToken,options)
+    .json(
+        apiResponse(
+            201,
+            {accessToken,refreshToken},
+            "Token created successfully"
+        )
+    )
+})
+
+
+
+export {registerUser,loginUser,logoutUser,refershAccessToken}
