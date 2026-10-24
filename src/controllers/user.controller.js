@@ -197,7 +197,8 @@ const changePassword = asyncHandeler(async(req,res)=>{
     if(!oldPassword || !newPassword){
         throw new apiError(400,"All credentials are required")
     }
-    const user = User.findById(req.user?._id)
+    const user =await  User.findById(req.user?._id)
+
 
     const isPasswordCorrect = await user.isPasswordCorrect(oldPassword)
 
@@ -225,11 +226,11 @@ const getCurrentUser = asyncHandeler(async(req,res)=>{
 const updateAccountDetails = asyncHandeler(async(req,res)=>{
     const {email, fullname} = req.body
 
-    if(!email || !fullname){
+    if(!email && !fullname){
         throw new apiError(400,"Email or Fullname required")
     }
 
-    const user = User.findByIdAndUpdate(
+    const user =await  User.findByIdAndUpdate(
         req.user?._id,
         {
             $set : {
@@ -246,7 +247,7 @@ const updateAccountDetails = asyncHandeler(async(req,res)=>{
 })
 
 const updateUserAvtar = asyncHandeler(async(req,res)=>{
-    const avtarUrl = req.file?.url
+    const avtarUrl = req.file?.path
 
     if(!avtarUrl){
         throw new apiError(400,"error while uploading an avtar")
@@ -262,13 +263,13 @@ const updateUserAvtar = asyncHandeler(async(req,res)=>{
         {new:true}
     )
 
-    return res.status(200).json(new apiResponse(200,user,"Avtar updated successfully"))
+    return res.status(200).json(new apiResponse(200,user,"avtar updated successfully"))
 })
 
 const updateCoverImg = asyncHandeler(async(req,res)=>{
-    const coverImgUrl = req.file?.url
+    const coverImgUrl = req.file?.path
 
-    if(!avtarUrl){
+    if(!coverImgUrl){
         throw new apiError(400,"error while uploading an cover image")
     }
 
@@ -303,7 +304,7 @@ const getUserChannelProfile = asyncHandeler(async(req,res)=>{
             $lookup:{
                 from : "subscriptions",
                 localField : "_id",
-                foreingField : "channel",
+                foreignField : "channel",
                 as : "subscribers"
             }
         },
@@ -359,7 +360,7 @@ const getUserChannelProfile = asyncHandeler(async(req,res)=>{
 })
 
 const getWatchHistory = asyncHandeler(async(req,res)=>{
-    const history = User.aggregate([
+    const history = await User.aggregate([
         {
             $match:{
                 _id : new mongoose.Types.ObjectId(req.user._id)
@@ -402,6 +403,9 @@ const getWatchHistory = asyncHandeler(async(req,res)=>{
             }
         }
     ])
+
+    // console.log(typeof(history))
+    // The history is an object because it is a promise but it will resolve to an array
 
     return res.status(200)
     .json(new apiResponse(201,history[0].watchHistory),"watch history fetched successfully")

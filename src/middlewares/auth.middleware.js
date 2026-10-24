@@ -7,10 +7,10 @@ export const verifyJwt = asyncHandeler(async(req,res,next)=>{
     try {
         const token = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ", "")
 
-        console.log("Cookies:", req.cookies);
-console.log("Authorization:", req.header("Authorization"));
-console.log("Extracted token:", token);
-console.log("Token type:", typeof token);
+//         console.log("Cookies:", req.cookies);
+// console.log("Authorization:", req.header("Authorization"));
+// console.log("Extracted token:", token);
+// console.log("Token type:", typeof token);
 
 
 

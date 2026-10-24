@@ -1,5 +1,6 @@
 import { v2 as cloudinary } from "cloudinary";
 import fs from "node:fs/promises"
+import { unlinkSync } from "node:fs";
 
 cloudinary.config({
     cloud_name: "ac5wkrgw",
@@ -12,7 +13,7 @@ const uploadOnCloudinary = async(localpath)=>{
     try {
         if(localpath){
             const response = cloudinary.uploader.upload(localpath,{resource_type : "auto"})
-            fs.unlinkSync(localpath)
+            unlinkSync(localpath)
 
             return response;
             
