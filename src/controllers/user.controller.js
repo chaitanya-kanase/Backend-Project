@@ -16,7 +16,7 @@ const generateAccessAndRefreshToken = async(userId)=>{
     user.refreshtoken = refreshToken
     await user.save({validateBeforeSave : false})
 
-    return {accessToken,refreshToken}
+    return { accessToken,refreshToken }
 }
 
 const registerUser = asyncHandeler(async(req,res)=>{
