@@ -1,6 +1,6 @@
 import { v2 as cloudinary } from "cloudinary";
 import fs from "node:fs/promises"
-import { unlinkSync } from "node:fs";
+import { unlinkSync, existsSync} from "node:fs";
 
 cloudinary.config({
     cloud_name: "ac5wkrgw",
@@ -11,9 +11,12 @@ cloudinary.config({
 
 const uploadOnCloudinary = async(localpath)=>{
     try {
+
         if(localpath){
-            const response = cloudinary.uploader.upload(localpath,{resource_type : "auto"})
-            unlinkSync(localpath)
+            const response =await cloudinary.uploader.upload(localpath,{resource_type : "auto"})
+
+            unlinkSync(localpath) 
+
 
             return response;
             
@@ -21,6 +24,7 @@ const uploadOnCloudinary = async(localpath)=>{
             return null
         }
     } catch (error) {
+
         await fs.unlink(localpath)
         console.log("cloudinary error :", error)
     }
