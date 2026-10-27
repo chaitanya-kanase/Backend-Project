@@ -9,8 +9,7 @@ import { apiResponse } from "../utils/apiResponse.js"
 
 const toggeleSubscription = asyncHandeler(async(req,res)=>{
     const {channelId} = req.params
-    const { subscriberId } = req.user._id
-
+    const subscriberId  = req.user?._id
 
     if(!mongoose.isValidObjectId(channelId)){
         throw new apiError(400, "Invalid channel ID")
@@ -54,9 +53,9 @@ const toggeleSubscription = asyncHandeler(async(req,res)=>{
 })
 
 const getChannelSubscribers = asyncHandeler(async(req,res)=>{
-    const channelId = req.params
+    const { channelId } = req.params
 
-    if(!channelId){
+    if(!mongoose.isValidObjectId(channelId)){
         throw new apiError(400,"Invalid channel ID")
     }
 
