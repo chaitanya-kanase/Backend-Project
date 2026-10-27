@@ -65,7 +65,7 @@ const addComment = asyncHandeler(async(req,res)=>{
         throw new apiError(400,"Invalid video ID")
     }
 
-    const video = await Video.findByOne({
+    const video = await Video.findOne({
         _id : videoId, 
         isPublished : true
     })
@@ -78,7 +78,7 @@ const addComment = asyncHandeler(async(req,res)=>{
     const comment = await Comment.create({
         content ,
         owner : req.user._id,
-        video : id
+        video : videoId
     })
 
     return res.status(201).json(
