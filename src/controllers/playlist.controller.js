@@ -1,12 +1,12 @@
 import mongoose, { isValidObjectId } from "mongoose"
 import { Playlist } from "../models/playlist.model.js"
 import { Video } from "../models/video.model.js"
-import { apiError, ApiError } from "../utils/ApiError.js"
-import { apiResponse, ApiResponse } from "../utils/ApiResponse.js"
-import { asyncHandler } from "../utils/asyncHandler.js"
+import { apiError } from "../utils/ApiError.js"
+import { apiResponse } from "../utils/ApiResponse.js"
+import { asyncHandeler } from "../utils/asyncHandeler.js"
 
 
-const createPlaylist = asyncHandler(async (req, res) => {
+const createPlaylist = asyncHandeler(async (req, res) => {
     const { name, description } = req.body
 
     if (typeof name !== "string" || !name.trim() || !description) {
@@ -26,7 +26,7 @@ const createPlaylist = asyncHandler(async (req, res) => {
 
 })
 
-const getUserPlaylists = asyncHandler(async (req, res) => {
+const getUserPlaylists = asyncHandeler(async (req, res) => {
     const { userId } = req.params
 
     if (!isValidObjectId(userId)) {
@@ -43,7 +43,7 @@ const getUserPlaylists = asyncHandler(async (req, res) => {
 
 })
 
-const getPlaylistById = asyncHandler(async (req, res) => {
+const getPlaylistById = asyncHandeler(async (req, res) => {
     const { playlistId } = req.params
 
     if (!isValidObjectId(playlistId)) {
@@ -61,7 +61,7 @@ const getPlaylistById = asyncHandler(async (req, res) => {
     )
 })
 
-const addVideoToPlaylist = asyncHandler(async (req, res) => {
+const addVideoToPlaylist = asyncHandeler(async (req, res) => {
     const { playlistId, videoId } = req.params
 
     if (!isValidObjectId(playlistId) || !isValidObjectId(videoId)) {
@@ -98,7 +98,7 @@ const addVideoToPlaylist = asyncHandler(async (req, res) => {
 
 })
 
-const removeVideoFromPlaylist = asyncHandler(async (req, res) => {
+const removeVideoFromPlaylist = asyncHandeler(async (req, res) => {
     const { playlistId, videoId } = req.params
 
     if (!isValidObjectId(playlistId) || !isValidObjectId(videoId)) {
@@ -137,7 +137,7 @@ const removeVideoFromPlaylist = asyncHandler(async (req, res) => {
 
 })
 
-const deletePlaylist = asyncHandler(async (req, res) => {
+const deletePlaylist = asyncHandeler(async (req, res) => {
     const { playlistId } = req.params
 
     if (!isValidObjectId(playlistId)) {
@@ -158,7 +158,7 @@ const deletePlaylist = asyncHandler(async (req, res) => {
     )
 })
 
-const updatePlaylist = asyncHandler(async (req, res) => {
+const updatePlaylist = asyncHandeler(async (req, res) => {
     const { playlistId } = req.params
     const { name, description } = req.body
     if (!isValidObjectId(playlistId)) {
